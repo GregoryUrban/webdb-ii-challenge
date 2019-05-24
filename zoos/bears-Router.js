@@ -1,26 +1,21 @@
-const knex = require('knex'); //1 to install knex
+const knex = require('knex'); 
 const router = require('express').Router();
-const knexConfig = { //4knex the object that tells knex what kind of db this is/ what adaptor am I going to use
-  client: 'sqlite3',// use this adaptor to connect to db
-  connection: {// pass a string or object
-    filename:'./data/lambda.sqlite3' // from the root folder!!!  -  on this tool filename is all lowercase instead of camelcase
+const knexConfig = { 
+  client: 'sqlite3',
+  connection: {
+    filename:'./data/bears.sqlite3' 
   },
   useNullAsDefault: true,
-  debug: true // whoah! This will console log the SQL version of the calls below (like db zoos = select*from)
+  debug: true 
 }
-const db = knex(knexConfig); //3knex a function to call the object in this case is the sql database
+const db = knex(knexConfig); 
 
-const bearsRouter = require('./bears-Router.js');
-router.use('/bears', bearsRouter);
-
-
-
-// this is /api/zoos
-// this is SELECT * FROM zoos
+// this is /api/bears
+// this is SELECT * FROM bears
 router.get('/', (req, res) => {
-  db('zoos') // 2knex <<  - returns a promise with all the rows
-  .then(zoos => {
-    res.status(200).json(zoos);
+  db('bears') 
+  .then(bears => {
+    res.status(200).json(bears);
   })
   .catch(err => {
     console.log(err);
@@ -29,16 +24,16 @@ router.get('/', (req, res) => {
 });
 
 
-// SELECT * FROM zoos WHERE ID = :ID
+// SELECT * FROM bears WHERE ID = :ID
 router.get('/:id', (req, res) => {
-  db('zoos')
+  db('bears')
   .where({ id: req.params.id })
-  .first() // this goes into the array and grabs the first match instead of writing json(zoo[0])
-  .then(zoo => {
-    if (zoo) {
-      res.status(200).json(zoo) // you could have this by itself but if you GET an ID That isnt there it wont give an error code that the client can react to, just an empty array
+  .first() // this goes into the array and grabs the first match instead of writing json(bear[0])
+  .then(bear => {
+    if (bear) {
+      res.status(200).json(bear) // you could have this by itself but if you GET an ID That isnt there it wont give an error code that the client can react to, just an empty array
     } else {
-      res.status(404).json('zoo not found Greg')
+      res.status(404).json('bear not found Greg')
     }
   })
   .catch(err => {
@@ -46,21 +41,21 @@ router.get('/:id', (req, res) => {
   })
 });
 
-// INSERT INTO zoos (Column Headers/ aka zoos) VALUES (Column Values/ aka req.body)
+// INSERT INTO bears (Column Headers/ aka bears) VALUES (Column Values/ aka req.body)
 router.post('/', (req, res) => {
-  // res.send('Write code to add a zoo');
+  // res.send('Write code to add a bear');
   if(!req.body.name) { // this is a verification of entering a required field, you could just leave the contents of the else statement below but you wouldnt verify
     res.status(400).json({message: 'Please provide a name'})
   } else{
-  db('zoos')
+  db('bears')
   .insert(req.body, 'id') // or ['id','name']
   .then(ids => {
     
-   return db('zoos')
+   return db('bears')
     .where({ id: ids[0] })
     .first() 
-    .then(zoo => {
-      res.status(201).json(zoo) 
+    .then(bear => {
+      res.status(201).json(bear) 
     })
     .catch(err => {
       res.status(500).json(err)
@@ -75,18 +70,18 @@ router.post('/', (req, res) => {
 
 // UPDATE 
 router.put('/:id', (req, res) => {
-  // update zoos FIRST Filter then update
+  // update bears FIRST Filter then update
   if(!req.body.name) { // this is a verification of entering a required field, you could just leave the contents of the else statement below but you wouldnt verify
     res.status(400).json({message: 'Please provide a name'})
   } else{
-    db('zoos')
+    db('bears')
     .where({ id: req.params.id })
     .update(req.body)
     .then(count => {
       if (count > 0) {
         res.status(200).json({message: `${count} ${count > 1 ? 'records' : 'record'} updated`})
       } else {
-        res.status(404).json({message: 'zoo does not exist'})
+        res.status(404).json({message: 'bear does not exist'})
       }
     })
     .catch(err => {
@@ -96,17 +91,17 @@ router.put('/:id', (req, res) => {
 });
 
 
-// DELETE FROM zoos WHERE ID = :ID
+// DELETE FROM bears WHERE ID = :ID
 router.delete('/:id', (req, res) => {
-  // remove zoos (inactivate the zoo)
-  db('zoos')
+  // remove bears (inactivate the bear)
+  db('bears')
   .where({ id: req.params.id })
   .del(req.body)
   .then(count => {
     if (count > 0) {
       res.status(200).json({message: `${count} ${count > 1 ? 'records' : 'record'} destroyed`})
     } else {
-      res.status(404).json({message: 'zoo does not exist'})
+      res.status(404).json({message: 'bear does not exist'})
     }
   })
   .catch(err => {
