@@ -10,8 +10,8 @@ const knexConfig = { //4knex the object that tells knex what kind of db this is/
 }
 const db = knex(knexConfig); //3knex a function to call the object in this case is the sql database
 
-const bearsRouter = require('./bears-Router.js');
-router.use('/bears', bearsRouter);
+// const bearsRouter = require('./bears-Router.js');
+// router.use('/bears', bearsRouter);
 
 
 
